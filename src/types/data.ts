@@ -47,7 +47,6 @@ export interface IAppStateModel {
 	order: IOrder;
 	formErrors: FormErrors;
 
-
 	setCatalog(items: IProduct[]): void;
 	addToBasket(item: IProduct): void;
 	removeFromBasket(id: string): void;

@@ -69,40 +69,71 @@ yarn build
 
 **Назначение:** Брокер событий для организации взаимодействия между компонентами
 
+**Параметры:** Конструктор не принимает параметров. При создании инициализируется пустая Map для хранения событий и их обработчиков.
+
 **Основные методы:**
-- `on<T>(eventName, callback)` - подписка на событие
-- `off(eventName, callback)` - отписка от события
-- `emit<T>(eventName, data?)` - генерация события
-- `onAll(callback)` - подписка на все события
-- `offAll()` - сброс всех обработчиков
-- `trigger<T>(eventName, context?)` - создание триггер-функции для генерации события
+- `on<T extends object>(eventName: EventName, callback: (data: T) => void): void` - подписка на событие
+- `off(eventName: EventName, callback: Subscriber): void` - отписка от события
+- `emit<T extends object>(eventName: string, data?: T): void` - генерация события с данными
+- `onAll(callback: (event: EmitterEvent) => void): void` - подписка на все события
+- `offAll(): void` - сброс всех обработчиков
+- `trigger<T extends object>(eventName: string, context?: Partial<T>): (event: object) => void` - создание триггер-функции для генерации события
+
+---
 
 ### Api
 
 **Назначение:** Базовый класс для взаимодействия с API сервера.
 
+**Конструктор:**
+```typescript
+constructor(baseUrl: string, options: RequestInit = {})
+```
+**Параметры:**
+- `baseUrl: string` - базовый URL для всех API запросов
+- `options: RequestInit` - опциональный объект с настройками для fetch запросов.
+
 **Основные методы:**
-- `get(uri: string)` - GET запрос
-- `post(uri: string, data: object, method?)` - POST/PUT/DELETE запрос
+- `get(uri: string): Promise<object>` - GET запрос
+- `post(uri: string, data: object, method: ApiPostMethods = 'POST'): Promise<object>` - POST/PUT/DELETE запрос
+
+---
 
 ### Component<T>
 
 **Назначение:** Абстрактный базовый класс для всех UI-компонентов.
 
+**Конструктор:**
+```typescript
+constructor(protected readonly container: HTMLElement)
+```
+**Параметры:**
+- `container: HTMLElement` - корневой DOM-элемент компонента, внутри которого будет происходить вся работа с отображением
+
 **Основные методы:**
-- `toggleClass(element, className, force?)` - переключение CSS класса
-- `setText(element, value)` - установка текстового содержимого
-- `setDisabled(element, state)` - установка состояния блокировки
-- `setHidden(element)` - скрытие элемента
-- `setVisible(element)` - отображение элемента
-- `setImage(element, src, alt?)` - установка изображения
-- `render(data?)` - рендеринг компонента
+- `toggleClass(element: HTMLElement, className: string, force?: boolean): void` - переключение CSS класса
+- `setText(element: HTMLElement, value: string): void` - установка текстового содержимого
+- `setDisabled(element: HTMLElement, state: boolean): void` - установка состояния блокировки
+- `setHidden(element: HTMLElement): void` - скрытие элемента
+- `setVisible(element: HTMLElement): void` - отображение элемента
+- `setImage(element: HTMLImageElement, src: string, alt?: string): void` - установка изображения
+- `render(data?: Partial<T>): HTMLElement` - рендеринг компонента с переданными данными
+
+---
 
 ## Модели данных (Model)
 
 ### AppState
 
 **Назначение:** Главная модель приложения, управляет состоянием всего приложения.
+
+**Конструктор:**
+```typescript
+constructor(data: Partial<IAppState>, protected events: IEvents)
+```
+**Параметры:**
+- `data: Partial<IAppState>` - начальное состояние приложения (обычно пустой объект `{}`).
+- `events: IEvents` - экземпляр EventEmitter для генерации событий об изменениях
 
 **Поля:**
 - `catalog: IProduct[]` - каталог товаров
@@ -111,14 +142,14 @@ yarn build
 - `formErrors: FormErrors` - ошибки валидации форм
 
 **Методы:**
-- `setCatalog(items: IProduct[])` - установка каталога товаров
-- `addToBasket(item: IProduct)` - добавление товара в корзину
-- `removeFromBasket(id: string)` - удаление товара из корзины
-- `clearBasket()` - очистка корзины
-- `getTotal()` - получение общей суммы заказа
-- `setOrderField(field, value)` - установка поля заказа
-- `validateOrder()` - валидация заказа
-- `validateContacts()` - валидация контактных данных
+- `setCatalog(items: IProduct[]): void` - установка каталога товаров
+- `addToBasket(item: IProduct): void` - добавление товара в корзину
+- `removeFromBasket(id: string): void` - удаление товара из корзины
+- `clearBasket(): void` - очистка корзины
+- `getTotal(): number` - получение общей суммы заказа
+- `setOrderField(field: keyof IOrder, value: string): void` - установка поля заказа
+- `validateOrder(): boolean` - валидация заказа
+- `validateContacts(): boolean` - валидация контактных данных
 
 **Генерируемые события:**
 - `catalog:changed` - изменение каталога
@@ -126,20 +157,41 @@ yarn build
 - `order:ready` - заказ исправен и готов к отправке
 - `formErrors:changed` - изменение ошибок валидации
 
+---
+
 ### LarekAPI
 
 **Назначение:** Класс для работы с API Web-ларька, наследуется от базового класса Api.
+
+**Конструктор:**
+```typescript
+constructor(cdn: string, baseUrl: string, options?: RequestInit)
+```
+**Параметры:**
+- `cdn: string` - URL CDN для загрузки изображений товаров
+- `baseUrl: string` - базовый URL API
+- `options?: RequestInit` - опциональные настройки для fetch запросов
 
 **Методы:**
 - `getProductList(): Promise<IProduct[]>` - получение списка товаров
 - `getProductItem(id: string): Promise<IProduct>` - получение товара по ID
 - `orderProducts(order: IOrder): Promise<IOrderResult>` - отправка заказа
 
+---
+
 ## Компоненты отображения (View)
 
 ### Page
 
 **Назначение:** Компонент главной страницы приложения.
+
+**Конструктор:**
+```typescript
+constructor(container: HTMLElement, protected events: IEvents)
+```
+**Параметры:**
+- `container: HTMLElement` - корневой элемент страницы
+- `events: IEvents` - экземпляр EventEmitter для генерации событий
 
 **Поля:**
 - `counter: HTMLElement` - счетчик товаров в корзине
@@ -148,9 +200,11 @@ yarn build
 - `basket: HTMLElement` - кнопка корзины
 
 **Методы:**
-- `set counter(value: number)` - установка значения счетчика
-- `set catalog(items: HTMLElement[])` - установка элементов каталога
-- `set locked(value: boolean)` - блокировка прокрутки страницы
+- `set counter(value: number): void` - установка значения счетчика
+- `set catalog(items: HTMLElement[]): void` - установка элементов каталога
+- `set locked(value: boolean): void` - блокировка прокрутки страницы
+
+---
 
 ### Card
 
@@ -161,6 +215,14 @@ yarn build
 - Карточка в модальном окне (превью)
 - Компактная карточка в корзине
 
+**Конструктор:**
+```typescript
+constructor(container: HTMLElement, actions?: ICardActions)
+```
+**Параметры:**
+- `container: HTMLElement` - DOM-элемент темплейта карточки (получается через `cloneTemplate()`)
+- `actions?: ICardActions` - опциональный объект с обработчиками событий. Обычно содержит `onClick: (event: MouseEvent) => void`.
+
 **Поля:**
 - `title: HTMLElement` - название товара
 - `image: HTMLImageElement` - изображение товара
@@ -170,16 +232,26 @@ yarn build
 - `button: HTMLButtonElement` - кнопка действия
 
 **Методы:**
-- `set id(value: string)` - установка ID
-- `set title(value: string)` - установка названия
-- `set image(value: string)` - установка изображения
-- `set category(value: string)` - установка категории
-- `set price(value: number | null)` - установка цены
-- `set description(value: string)` - установка описания
+- `set id(value: string): void` - установка ID
+- `set title(value: string): void` - установка названия
+- `set image(value: string): void` - установка изображения
+- `set category(value: string): void` - установка категории
+- `set price(value: number | null): void` - установка цены
+- `set description(value: string): void` - установка описания
+
+---
 
 ### Basket
 
 **Назначение:** Компонент корзины покупок.
+
+**Конструктор:**
+```typescript
+constructor(container: HTMLElement, protected events: IEvents)
+```
+**Параметры:**
+- `container: HTMLElement` - DOM-элемент темплейта корзины
+- `events: IEvents` - экземпляр EventEmitter для генерации события открытия формы заказа
 
 **Поля:**
 - `list: HTMLElement` - список товаров
@@ -187,13 +259,23 @@ yarn build
 - `button: HTMLButtonElement` - кнопка оформления
 
 **Методы:**
-- `set items(items: HTMLElement[])` - установка списка товаров
-- `set total(value: number)` - установка общей суммы
-- `set selected(items: string[])` - смена состояния кнопки "оформить" в зависимости от наличия заказов в корзине.
+- `set items(items: HTMLElement[]): void` - установка списка товаров
+- `set total(value: number): void` - установка общей суммы
+- `set selected(items: string[]): void` - смена состояния кнопки "оформить" в зависимости от наличия заказов в корзине
+
+---
 
 ### Order
 
 **Назначение:** Компонент формы заказа (первый шаг - способ оплаты и адрес).
+
+**Конструктор:**
+```typescript
+constructor(container: HTMLFormElement, protected events: IEvents)
+```
+**Параметры:**
+- `container: HTMLFormElement` - DOM-элемент формы заказа
+- `events: IEvents` - экземпляр EventEmitter для генерации событий при изменении полей и отправке формы
 
 **Поля:**
 - `payment: HTMLElement` - кнопки выбора способа оплаты
@@ -201,61 +283,103 @@ yarn build
 - `formErrors: FormErrors` - ошибки формы
 
 **Методы:**
-- `set payment(value: string)` - установка способа оплаты
-- `set address(value: string)` - установка адреса
-- `set valid(value: boolean)` - установка валидности формы
-- `set errors(value: string)` - установка текста ошибки
+- `set payment(value: string): void` - установка способа оплаты
+- `set address(value: string): void` - установка адреса
+- `set valid(value: boolean): void` - установка валидности формы
+- `set errors(value: string): void` - установка текста ошибки
+
+---
 
 ### Contacts
 
 **Назначение:** Компонент формы контактных данных (второй шаг - email и телефон).
+
+**Конструктор:**
+```typescript
+constructor(container: HTMLFormElement, protected events: IEvents)
+```
+**Параметры:**
+- `container: HTMLFormElement` - DOM-элемент формы контактов
+- `events: IEvents` - экземпляр EventEmitter для генерации событий при изменении полей и отправке формы
 
 **Поля:**
 - `email: HTMLInputElement` - поле ввода email
 - `phone: HTMLInputElement` - поле ввода телефона
 
 **Методы:**
-- `set email(value: string)` - установка email
-- `set phone(value: string)` - установка телефона
-- `set valid(value: boolean)` - установка валидности формы
-- `set errors(value: string)` - установка текста ошибки
+- `set email(value: string): void` - установка email
+- `set phone(value: string): void` - установка телефона
+- `set valid(value: boolean): void` - установка валидности формы
+- `set errors(value: string): void` - установка текста ошибки
+
+---
 
 ### Success
 
 **Назначение:** Компонент модального окна успешного оформления заказа.
+
+**Конструктор:**
+```typescript
+constructor(container: HTMLElement, actions: ISuccessActions)
+```
+**Параметры:**
+- `container: HTMLElement` - DOM-элемент темплейта окна успеха
+- `actions: ISuccessActions` - объект с обработчиками событий. Обычно содержит `onClick: () => void` для закрытия окна
 
 **Поля:**
 - `total: HTMLElement` - списанная сумма
 - `close: HTMLButtonElement` - кнопка закрытия
 
 **Методы:**
-- `set total(value: number)` - установка суммы
+- `set total(value: number): void` - установка суммы
+
+---
 
 ### Modal
 
 **Назначение:** Компонент модального окна.
+
+**Конструктор:**
+```typescript
+constructor(container: HTMLElement, protected events: IEvents)
+```
+**Параметры:**
+- `container: HTMLElement` - DOM-элемент контейнера модального окна
+- `events: IEvents` - экземпляр EventEmitter для генерации событий открытия/закрытия
 
 **Поля:**
 - `content: HTMLElement` - контейнер содержимого
 - `closeButton: HTMLButtonElement` - кнопка закрытия
 
 **Методы:**
-- `set content(value: HTMLElement)` - установка содержимого
-- `open()` - открытие модального окна
-- `close()` - закрытие модального окна
+- `set content(value: HTMLElement): void` - установка содержимого
+- `open(): void` - открытие модального окна
+- `close(): void` - закрытие модального окна
+
+---
 
 ### Form
 
 **Назначение:** Базовый компонент формы.
+
+**Конструктор:**
+```typescript
+constructor(container: HTMLFormElement, protected events: IEvents)
+```
+**Параметры:**
+- `container: HTMLFormElement` - DOM-элемент формы
+- `events: IEvents` - экземпляр EventEmitter для генерации событий при изменении полей и отправке
 
 **Поля:**
 - `submit: HTMLButtonElement` - кнопка отправки
 - `errors: HTMLElement` - контейнер ошибок
 
 **Методы:**
-- `set valid(value: boolean)` - установка валидности формы
-- `set errors(value: string)` - установка текста ошибок
-- `render(state)` - рендеринг состояния формы
+- `set valid(value: boolean): void` - установка валидности формы
+- `set errors(value: string): void` - установка текста ошибок
+- `render(state: Partial<T> & IFormState): HTMLElement` - рендеринг состояния формы
+
+---
 
 ## Типы данных
 
