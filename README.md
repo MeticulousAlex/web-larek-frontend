@@ -11,7 +11,7 @@
 
 Структура проекта:
 - src/ — исходные файлы проекта
-- src/components/ — папка с JS компонентами
+- src/components/ — папка с компонентами
 - src/components/base/ — папка с базовым кодом
 
 Важные файлы:
@@ -114,8 +114,6 @@ constructor(protected readonly container: HTMLElement)
 - `toggleClass(element: HTMLElement, className: string, force?: boolean): void` - переключение CSS класса
 - `setText(element: HTMLElement, value: string): void` - установка текстового содержимого
 - `setDisabled(element: HTMLElement, state: boolean): void` - установка состояния блокировки
-- `setHidden(element: HTMLElement): void` - скрытие элемента
-- `setVisible(element: HTMLElement): void` - отображение элемента
 - `setImage(element: HTMLImageElement, src: string, alt?: string): void` - установка изображения
 - `render(data?: Partial<T>): HTMLElement` - рендеринг компонента с переданными данными
 
@@ -148,6 +146,7 @@ constructor(data: Partial<IAppState>, protected events: IEvents)
 - `clearBasket(): void` - очистка корзины
 - `getTotal(): number` - получение общей суммы заказа
 - `setOrderField(field: keyof IOrder, value: string): void` - установка поля заказа
+- `setContactsField(field: keyof IOrder, value: string): void` - установка поля контактов
 - `validateOrder(): boolean` - валидация заказа
 - `validateContacts(): boolean` - валидация контактных данных
 

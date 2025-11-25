@@ -16,10 +16,10 @@ export type ProductCategory =
 	| 'хард-скил';
 
 
-export type PaymentMethod = 'Онлайн' | 'При получении';
+export type PaymentMethod = 'Онлайн' | 'При получении' | '';
 
 export interface IOrder {
-	payment: PaymentMethod;
+	payment: string;
 	email: string;
 	phone: string;
 	address: string;
@@ -53,6 +53,7 @@ export interface IAppStateModel {
 	clearBasket(): void;
 	getTotal(): number;
 	setOrderField(field: keyof IOrder, value: string): void;
+	setContactsField(field: keyof IOrder, value: string): void;
 	validateOrder(): boolean;
 	validateContacts(): boolean;
 }
