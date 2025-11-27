@@ -1,10 +1,5 @@
-/**
- * Базовый компонент
- */
 export abstract class Component<T> {
-    protected constructor(protected readonly container: HTMLElement) {
-        // Инициализация базового компонента
-    }
+    protected constructor(protected readonly container: HTMLElement) {}
 
     // Переключить класс
     toggleClass(element: HTMLElement, className: string, force?: boolean) {

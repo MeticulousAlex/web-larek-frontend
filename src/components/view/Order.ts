@@ -2,6 +2,7 @@ import { Form } from './Form';
 import { IEvents } from '../base/events';
 import { IOrderForm } from '../../types/components';
 import { ensureAllElements } from '../../utils/utils';
+import { Events } from '../../types/events';
 
 export class Order extends Form<IOrderForm> {
     protected _paymentButtons: HTMLButtonElement[];
@@ -16,13 +17,13 @@ export class Order extends Form<IOrderForm> {
         this._paymentButtons.forEach(button => {
             button.addEventListener('click', () => {
                 this.payment = button.textContent;
-                events.emit('order.payment:change', { field: 'payment', value: button.textContent });
+                events.emit(Events.ORDER_PAYMENT_CHANGE, { field: 'payment', value: button.textContent });
             });
         });
 
         this._addressInput.addEventListener('change', () => {
             this.address = this._addressInput.value;
-            events.emit('order.address:change', {field: 'address', value: this._addressInput.value})
+            events.emit(Events.ORDER_ADDRESS_CHANGE, {field: 'address', value: this._addressInput.value})
         })
     }
 

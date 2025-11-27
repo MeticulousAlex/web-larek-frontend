@@ -1,5 +1,6 @@
 import { IEvents } from '../base/events';
 import { IProduct, IOrder, FormErrors, IAppState } from '../../types/data';
+import { Events } from '../../types/events';
 
 export class AppState implements IAppState {
     catalog: IProduct[] = [];
@@ -20,7 +21,7 @@ export class AppState implements IAppState {
 
     setCatalog(items: IProduct[]): void {
         this.catalog = items;
-        this.events.emit('catalog:changed', { catalog: this.catalog });
+        this.events.emit(Events.CATALOG_CHANGED, { catalog: this.catalog });
     }
 
     addToBasket(item: IProduct): void {
@@ -29,19 +30,19 @@ export class AppState implements IAppState {
         }
         if (!this.basket.find(basketItem => basketItem.id === item.id)) {
             this.basket.push(item);
-            this.events.emit('basket:changed', { basket: this.basket });
+            this.events.emit(Events.BASKET_CHANGED, { basket: this.basket });
         }
     }
 
     removeFromBasket(id: string): void {
         this.basket = this.basket.filter(item => item.id !== id);
-        this.events.emit('basket:changed', { basket: this.basket });
+        this.events.emit(Events.BASKET_CHANGED, { basket: this.basket });
     }
 
     // Очистить корзину когда заказ завершен
     clearBasket(): void {
         this.basket = [];
-        this.events.emit('basket:changed', { basket: this.basket });
+        this.events.emit(Events.BASKET_CHANGED, { basket: this.basket });
     }
 
     // Получить всю сумму заказа
@@ -53,7 +54,7 @@ export class AppState implements IAppState {
         this.order[field] = value as never;
 
         if (this.validateOrder()) {
-            this.events.emit('order:ready', this.order);
+            this.events.emit(Events.ORDER_READY, this.order);
         }
     }
     
@@ -61,7 +62,7 @@ export class AppState implements IAppState {
         this.order[field] = value as never;
 
         if (this.validateContacts()) {
-            this.events.emit('order:ready', this.order);
+            this.events.emit(Events.ORDER_READY, this.order);
         }
     }
 
@@ -76,7 +77,7 @@ export class AppState implements IAppState {
         }
 
         this.formErrors = errors;
-        this.events.emit('formErrors:changed', this.formErrors);
+        this.events.emit(Events.FORM_ERRORS_CHANGED, this.formErrors);
         return Object.keys(errors).length === 0;
     }
 
@@ -92,7 +93,7 @@ export class AppState implements IAppState {
         }
 
         this.formErrors = errors;
-        this.events.emit('formErrors:changed', this.formErrors);
+        this.events.emit(Events.FORM_ERRORS_CHANGED, this.formErrors);
         return Object.keys(errors).length === 0;
     }
 }

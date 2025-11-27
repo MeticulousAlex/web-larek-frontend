@@ -77,7 +77,8 @@ export class Card extends Component<ICard> {
         this.setText(this._category, value);
         const categoryClass = categoryClasses[value] || 'card__category_other';
         this._category.className = 'card__category';
-        this._category.classList.add(categoryClass);
+        this.toggleClass(this._category, categoryClass, true);
+        
     }
 
     set price(value: number | null) {
